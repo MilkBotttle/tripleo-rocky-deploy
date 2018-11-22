@@ -1,0 +1,30 @@
+---
+# tasks: 
+# tags: create-images-tarball, setup-local-registry, always
+# , insall undercloud ?, 
+
+# Get fact at first
+- host: all
+  tasks:
+    - setup:
+
+# install requirement
+- host: localhost
+  gather_fact: no
+  vars:
+    registry_server: 172.22.104.10
+  roles:
+    - role: { create-local-registry, tags: prepare}
+  tasks:
+    - name: install jq
+      yum:
+        name:
+          - ../files/jq/oniguruma-5.9.5-3.el7.x86_64.rpm
+          - ../files/jq-1.5-1.el7.x86_64.rpm
+
+# pull and push to local registry
+- host: localhost
+  become: true
+  roles:
+    - role: { prepare-images, tags: prepare_image}
+    - role: { create-local-registry, tags: push_images }

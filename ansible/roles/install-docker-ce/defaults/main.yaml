@@ -1,0 +1,5 @@
+docker_cleanup_packages_EL:
+  - {package: "docker"}
+  - {package: "docker-common"}
+  - {package: "docker-client"}
+  - {package: "docker-engine"}
