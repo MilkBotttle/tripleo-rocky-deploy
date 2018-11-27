@@ -5,10 +5,10 @@
 #   - prepare local registry images tarball for offline
 
 # install requirement
-- host: localhost
-  gather_fact: no
+- hosts: localhost
+  gather_facts: no
   roles:
-    - role: { create-local-registry, tags: prepare}
+    - { role: create-local-registry, tags: prepare}
   tasks:
     - name: install jq
       yum:
@@ -17,15 +17,15 @@
           - ../files/jq-1.5-1.el7.x86_64.rpm
 
 # pull, push and create local registry
-- host: localhost
-  gather_fact: no
+- hosts: localhost
+  gather_facts: no
   become: true
   roles:
-    - role: { prepare-images, tags: prepare_image}
-    - role: { create-local-registry, create_by_tar: false}
+    - { role: prepare-images, tags: prepare_image}
+    - { role: create-local-registry, create_by_tar: false}
 
-- host: localhost
-  gather_fact: no
+- hosts: localhost
+  gather_facts: no
   tasks:
     - name: Tar all images
       archive:
