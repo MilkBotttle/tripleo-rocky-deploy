@@ -4,5 +4,5 @@
   shell: |
     docker tag {{ item.name }}:current-tripleo {{ registry_server }}:8787/{{ item.name }}:current-tripleo
     docker push {{ registry_server }}:8787/{{ item.name }}:current-tripleo
-  with_items: {{ images_list.json.results }}
+  with_items: "{{ images_list.json.results }}"
 
