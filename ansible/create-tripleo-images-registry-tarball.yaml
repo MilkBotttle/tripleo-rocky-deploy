@@ -8,7 +8,8 @@
 - hosts: localhost
   gather_facts: no
   roles:
-    - { role: create-local-registry, tags: prepare}
+    - role: create-local-registry
+      tags: prepare
   tasks:
     - name: install jq
       yum:
@@ -21,8 +22,11 @@
   gather_facts: no
   become: true
   roles:
-    - { role: prepare-images, tags: prepare_image}
-    - { role: create-local-registry, create_by_tar: false}
+    - role: prepare-images
+      tags: prepare_image
+    - role: create-local-registry
+      vars: 
+        create_by_tar: false
 
 - hosts: localhost
   gather_facts: no
