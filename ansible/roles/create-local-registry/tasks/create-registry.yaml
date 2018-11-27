@@ -17,7 +17,7 @@
 - name: Config accept port 8787
   iptables:
     chain: INPUT
-    distination_port: 8787
+    destination_port: 8787
     jump: ACCEPT
   become: yes
   tags: prepare
