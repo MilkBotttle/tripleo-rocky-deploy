@@ -8,7 +8,6 @@
   register: docker_login
   tags:
     - prepare_image
-    - pull_only
 
 - name: Get TripleO images list
   uri:
@@ -17,7 +16,6 @@
   register: images_list
   tags:
     - prepare_image
-    - pull_only
 
 - name: Pull TripleO image
   docker_image:
@@ -26,12 +24,3 @@
   with_items: "{{ images_list.json.results }}"
   tags: 
     - prepare_image
-    - pull_only
-
-- name: Save TreipleO image to tar
-  shell: |
-    docker image save {{ item.name }} -o {{ tripleo_image_tar_dest }}/{{ item.name }}.tar
-  with_items: "{{ images_list.json.results }}"
-  tags: 
-    - prepare_image
-    - tar_image

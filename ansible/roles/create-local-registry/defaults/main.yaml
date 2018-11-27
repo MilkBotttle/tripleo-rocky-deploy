@@ -1,0 +1,3 @@
+---
+registry_server: 127.0.0.1
+tripleo_tar_images: tripleo-images.tar

@@ -1,26 +1,8 @@
 ---
 - hosts: localhost
-  gather_facts: no
+  gather_facts: no 
   vars:
-    docker_user: "cameroninwinstack"
-    docker_password: "cameroninwin888"
-    TRIPLEOREPO: "tripleorocky"
+    - gg: "GG"
   tasks:
-    - uri:
-        url: https://hub.docker.com/v2/users/login/
-        body: '{"username": "{{docker_user}}", "password": "{{docker_password}}"}'
-        body_format: json
-      register: docker_login
-
-    - name: Get TripleO images list
-      uri:
-        url: "https://hub.docker.com/v2/repositories/{{ TRIPLEOREPO }}/?page_size=200&q={{ TRIPLEOREPO }}%2Fcentos-binary-"
-        headers: 
-          Authorization: "JWT {{docker_login.cookies.token}}"
-      register: images_list
-
-    - name: Pull image {{item}} ...
-      docker_image:
-        name: item
-        pull: yes
-      with_items: "{{images_list.json.results}}"
+    - shell: |
+        touch {{gg}} 

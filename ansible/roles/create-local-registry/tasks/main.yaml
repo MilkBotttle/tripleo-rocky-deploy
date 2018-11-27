@@ -1,38 +1,11 @@
 ---
-# require var: registry_server 
-- name: Install docker registry
-  yum:
-    name: docker-distribution
-  tags: prepare
+- include_tasks: create-registry.yaml
 
-- name: Config registry
-  template:
-    src: ../templates/config.yaml.j2
-    path: /etc/docker-distribution/registry/config.yaml
-    mode: 0644
-    owner: root
-    group: root
-  tags: prepare
+- include_tasks: create-by-tar.yaml
+  when: create_by_tar is true
 
-- name: Start docker-distribution
-  systemd:
-    name: docker-distribution
-    state: started
-    enabled: true
-  tags: prepare
+- include_tasks: create-by-push.yaml
+  when: create_by_tar is false
 
-- name: Config accept port 8787
-  iptables:
-    chain: INPUT
-    distination_port: 8787
-    jump: ACCEPT
-  become: yes
-  tags: prepare
 
-- name: Push images to registry
-  docker_image:
-    push: yes
-    name: "{{registry_server}:8787"
-    tag: current-tripleo
-    load_path: tripleo-images.tar
-  tags: push_images
+

@@ -1,0 +1,22 @@
+---
+# Copy tar images then extract at registry folder, without push images.
+# required vars:
+#   - tripleo_tar_images: images tar images
+- name: Stop docker-distribution
+  systemd:
+    name: docker-distribution
+    state: stoped
+
+- name: Extract tar image to registry
+  unarchive:
+    copy: true
+    src: "{{ tripleo_tar_images }}"
+    dest: /var/lib/registry
+    owner: root
+    group: root
+
+- name: Start docker-distribution
+  systemd:
+    name: docker-distribution
+    state: started
+

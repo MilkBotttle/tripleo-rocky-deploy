@@ -1,0 +1,35 @@
+---
+# This playbook will handle those tasks:
+#   - install require pkgs
+#   - create local registry
+#   - prepare local registry images tarball for offline
+
+# install requirement
+- host: localhost
+  gather_fact: no
+  roles:
+    - role: { create-local-registry, tags: prepare}
+  tasks:
+    - name: install jq
+      yum:
+        name:
+          - ../files/jq/oniguruma-5.9.5-3.el7.x86_64.rpm
+          - ../files/jq-1.5-1.el7.x86_64.rpm
+
+# pull, push and create local registry
+- host: localhost
+  gather_fact: no
+  become: true
+  roles:
+    - role: { prepare-images, tags: prepare_image}
+    - role: { create-local-registry, create_by_tar: false}
+
+- host: localhost
+  gather_fact: no
+  tasks:
+    - name: Tar all images
+      archive:
+        format: tar
+        path: /var/lib/registry
+        dest: tripleo-images.tar
+
