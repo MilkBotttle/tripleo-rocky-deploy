@@ -1,4 +1,7 @@
 ---
 - hosts:
+  gather_facts: no
   roles:
-    - role: {create-local-registry}
+    - role: create-local-registry
+      vars:
+        create_by_tar: true

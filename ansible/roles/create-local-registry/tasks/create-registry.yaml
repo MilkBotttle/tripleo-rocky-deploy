@@ -8,16 +8,17 @@
 - name: Config registry
   template:
     src: ../templates/config.yaml.j2
-    dest: /etc/docker-distribution/registry/config.yaml
+    dest: /etc/docker-distribution/registry/config.yml
     mode: 0644
     owner: root
     group: root
   tags: prepare
 
-- name: Config accept port 8787
+- name: Config firewall accept registry port
   iptables:
     chain: INPUT
-    destination_port: 8787
+    destination_port: {{ registry_port }}
+    protocol: tcp
     jump: ACCEPT
   become: yes
   tags: prepare

@@ -2,7 +2,10 @@
 
 - name: Push images to registry
   shell: |
-    docker tag {{ item.name }}:current-tripleo {{ registry_server }}:8787/{{ item.name }}:current-tripleo
-    docker push {{ registry_server }}:8787/{{ item.name }}:current-tripleo
+    docker tag {{ tripleo_image_repo }}/{{ item.name }}:{{ tripleo_tag }} {{ registry_server }}:{{ registry_port }}/{{ item.name }}:{{ tripleo_tag }}
+    docker push {{ registry_server }}:{{ registry_port }}/{{ item.name }}:{{ tripleo_tag }}
+  loop_control:
+    label: "Push {{ item.name }}"
+  when: '"centos-binary-" in item.name'
   with_items: "{{ images_list.json.results }}"
 

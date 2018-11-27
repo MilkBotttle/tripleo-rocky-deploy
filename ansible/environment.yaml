@@ -1,0 +1,13 @@
+# docker io login
+docker_user: cameroninwinstack
+docker_password: cameroninwin888
+
+# docker registry listened ip, port
+registry_server: 127.0.0.1
+registry_port: 8787
+
+# tripleo images tag
+tripleo_tag: current-tripleo
+
+# create offline registry tarball path
+tripleo_tar_iamges: tripleo-images.tar

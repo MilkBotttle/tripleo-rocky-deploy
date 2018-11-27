@@ -12,7 +12,8 @@
 - name: Get TripleO images list
   uri:
     url: "https://hub.docker.com/v2/repositories/{{ tripleo_image_repo }}/?page_size=200&q={{ tripleo_image_repo }}%2Fcentos-binary-"
-    headers: "Authorization: JWT {{docker_login.cookies.token}}"
+    headers:
+      Authorization: "JWT {{ docker_login.cookies.token }}"
   register: images_list
   tags:
     - prepare_image
@@ -21,6 +22,10 @@
   docker_image:
     name: "{{ tripleo_image_repo }}/{{ item.name }}"
     pull: yes
+    tag: "{{ tripleo_tag }}"
+  when: '"centos-binary-" in item.name'
+  loop_control:
+    label: "{{ item.name }}"
   with_items: "{{ images_list.json.results }}"
-  tags: 
+  tags:
     - prepare_image
