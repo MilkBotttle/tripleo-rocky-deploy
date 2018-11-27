@@ -8,7 +8,7 @@
 - name: Config registry
   template:
     src: ../templates/config.yaml.j2
-    path: /etc/docker-distribution/registry/config.yaml
+    dest: /etc/docker-distribution/registry/config.yaml
     mode: 0644
     owner: root
     group: root
