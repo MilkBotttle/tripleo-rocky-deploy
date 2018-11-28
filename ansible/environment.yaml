@@ -10,4 +10,4 @@ registry_port: 8787
 tripleo_tag: current-tripleo
 
 # create offline registry tarball path
-tripleo_tar_iamges: tripleo-images.tar
+tripleo_tar_images: tripleo-images.tar
