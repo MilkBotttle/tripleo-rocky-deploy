@@ -1,0 +1,13 @@
+---
+- name: Setup hostname
+  hostname:
+    name: "{{ undercloud_fqdn }}"
+  tags: setup
+
+- name: Config /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "127.0.0.1 {{ undercloud_fqdn }} {{ undercloud_hostname }}"
+    insertafter: EOF
+    state: present
+  tags: setup

@@ -1,0 +1,12 @@
+---
+# tasks file for undercloud
+- include_tasks: create_stack_user.yaml
+- include_tasks: setup_hostname.yaml
+- include_tasks: install_deps.yaml
+
+- name: Prepare undercloud.conf
+  copy:
+    src: ../files/undercloud.conf
+    dest: /home/stack/undercloud.conf
+    owner: stack
+    group: stack

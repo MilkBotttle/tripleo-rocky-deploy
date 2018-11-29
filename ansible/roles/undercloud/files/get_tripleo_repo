@@ -1,0 +1,16 @@
+#!/bin/bash
+
+get_tripleo_repo(){
+  # Cameron.C: Download python2-tripleo-repos-<version>.el7.centos.noarch.rpm
+  TRIPLEO_REPOS=$(curl $BASE | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep "^python2-tripleo-repos-" | grep ".el7.noarch.rpm$")
+  echo "$TRIPLEO_REPOS"
+}
+
+install_repo(){
+  yum install -y $BASE$TRIPLEO_REPOS
+}
+
+BASE=https://trunk.rdoproject.org/centos7/current/
+
+get_tripleo_repo
+install_repo

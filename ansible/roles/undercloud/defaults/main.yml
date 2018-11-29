@@ -1,0 +1,7 @@
+---
+# defaults file for undercloud
+stack_user_password: password
+undercloud_fqdn: undercloud.inwinstack.tw
+undercloud_hostname: undercloud
+tripleo_version: rocky
+offline_install: flase

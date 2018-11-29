@@ -1,0 +1,21 @@
+---
+- name: Create stack group
+  group:
+    name: stack
+    state: present
+
+- name: Create stack user
+  user:
+    name: stack
+    group: stack
+    state: present
+    shell: /bin/bash
+
+- name: Grant sudo privileges to stack user
+  copy:
+    content: |
+      stack ALL=(ALL) NOPASSWD:ALL
+    dest: /etc/sudoers.d/stack
+    owner: root
+    group: root
+    mode: 0440
