@@ -11,9 +11,6 @@
     - role: create-local-registry
       tags: prepare
   tasks:
-    - name: install pip
-      shell: |
-        curl https://bootstrap.pypa.io/get-pip.py -o - | python -
     - name: install jq
       yum:
         name:

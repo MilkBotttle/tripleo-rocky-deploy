@@ -9,5 +9,11 @@ registry_port: 8787
 # tripleo images tag
 tripleo_tag: current-tripleo
 
+# ceph image tag, image, namespace
+# This will run : `docker pull ceph/daemon:v3.0.3-stable-3.0-luminous-centos-7-x86_64`
+ceph_image: daemon
+ceph_namespace: ceph
+ceph_tag: v3.0.3-stable-3.0-luminous-centos-7-x86_64
+
 # create offline registry tarball path
 tripleo_tar_images: tripleo-images.tar

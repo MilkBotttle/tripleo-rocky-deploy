@@ -29,3 +29,11 @@
   with_items: "{{ images_list.json.results }}"
   tags:
     - prepare_image
+
+- name: Pull Ceph image
+  docker_image:
+    name: "{{ ceph_namespace }}/{{ ceph_image }}"
+    pull: yes
+    tag: "{{ ceph_tag}}"
+  tags:
+    - prepare_image

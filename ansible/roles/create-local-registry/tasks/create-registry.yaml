@@ -23,6 +23,19 @@
   become: yes
   tags: prepare
 
+- name: Add insecure-registries json
+  template:
+    src: ../templates/daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+  tags: prepare
+
+- name: Restart docker
+  systemd:
+    state: restarted
+    name: docker
+
 - name: Start docker-distribution
   systemd:
     name: docker-distribution
