@@ -1,16 +1,16 @@
 ---
 - include_tasks: create-registry.yaml
+  when:
+    - prepare == true
 
 - name: Create local registry by tarball
   include_tasks: create-by-tar.yaml
   when:
-    - create_by_tar is defined
     - create_by_tar == true
 
 - name: Create local registry by push
   include_tasks: create-by-push.yaml
   when:
-    - create_by_tar is defined
     - create_by_tar == false
 
 

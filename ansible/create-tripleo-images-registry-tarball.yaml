@@ -9,7 +9,8 @@
   gather_facts: no
   roles:
     - role: create-local-registry
-      tags: prepare
+      vars:
+        - prepare: true
   tasks:
     - name: install jq
       yum:
@@ -26,7 +27,6 @@
   become: true
   roles:
     - role: prepare-images
-      tags: prepare_image
     - role: create-local-registry
       vars:
         create_by_tar: false
@@ -39,4 +39,6 @@
         format: tar
         path: /var/lib/registry/docker
         dest: tripleo-images.tar
-
+      when:
+        - archive_images is defined
+        - archive_images == true

@@ -2,53 +2,9 @@
 
 - name: Pull images
   docker_image:
-    name: "{{ item.value.split(":")[0]"
-    tag: "{{ item.value.split(":")[1]"
+    name: "{{ item.values()[0].split(":")[0] }}"
+    tag: "{{ item.values()[0].split(":")[1]"
     pull: yes
   loop_control:
-    label: "Pull {{ item.key }}"
+    label: "Pull {{ item.keys()[0] }}"
   with_items:"{{ tripleo_images_list }}"
-#- name: Get Docker hub auth
-#  uri:
-#    url: https://hub.docker.com/v2/users/login/
-#    body: '{"username": "{{docker_user}}", "password": "{{docker_password}}"}'
-#    body_format: json
-#  register: docker_login
-#  tags:
-#    - prepare_image
-#
-#- name: Get TripleO images list
-#  uri:
-#    url: "https://hub.docker.com/v2/repositories/{{ tripleo_image_repo }}/?page_size=200&q={{ tripleo_image_repo }}%2Fcentos-binary-"
-#    headers:
-#      Authorization: "JWT {{ docker_login.cookies.token }}"
-#  register: images_list
-#  tags:
-#    - prepare_image
-
-#- name: Pull TripleO image
-#  docker_image:
-#    name: "{{ tripleo_image_repo }}/{{ item.name }}"
-#    pull: yes
-#    tag: "{{ tripleo_tag }}"
-#  when: '"centos-binary-" in item.name'
-#  loop_control:
-#    label: "{{ item.name }}"
-#  with_items: "{{ images_list.json.results }}"
-#  tags:
-#    - prepare_image
-#
-#- name: Pull Ceph image
-#  docker_image:
-#    name: "{{ ceph_namespace }}/{{ ceph_image }}"
-#    pull: yes
-#    tag: "{{ ceph_tag}}"
-#  tags:
-#    - prepare_image
-#
-#- name: Pull Openshift images
-#  docker_image:
-#    name: "{{item}}"
-#    pull: yes
-#    tag: "{{ item.split(":")[1] }}"
-#  with_items: "{{ OpenShift_images }}"
