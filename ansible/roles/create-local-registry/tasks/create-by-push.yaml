@@ -1,15 +1,13 @@
 ---
 
-- name: Push OpenStack images to registry
+- name: Get images name list
   shell: |
-    docker tag {{ tripleo_image_repo }}/{{ item.name }}:{{ tripleo_tag }} {{ registry_server }}:{{ registry_port }}/{{ item.name }}:{{ tripleo_tag }}
-    docker push {{ registry_server }}:{{ registry_port }}/{{ item.name }}:{{ tripleo_tag }}
-  loop_control:
-    label: "Push {{ item.name }}"
-  when: '"centos-binary-" in item.name'
-  with_items: "{{ images_list.json.results }}"
+    # repository tag
+    docker images | grep -v ID | awk '{print $1,$2}'
+  register: docker_images
 
-- name: Push Ceph image to registry
+- name: Push all images
   shell: |
-    docker tag {{ ceph_namespace }}/{{ ceph_image }}:{{ ceph_tag }} {{ registry_server }}:{{ registry_port }}/{{ ceph_namespace }}/{{ ceph_image }}:{{ ceph_tag }}
-    docker push {{ registry_server }}:{{ registry_port }}/{{ ceph_namespace }}/{{ ceph_image }}:{{ ceph_tag }}
+    docker tag {{ item.split(' ')[0] }}:{{ item.split(' ')[1] }} {{ registry_server }}:{{ registry_port }}/{{ item.split(' ')[0] }}:{{ item.split(' ')[1] }}
+    docker push {{ registry_server }}:{{ registry_port }}/{{ item.split(' ')[0] }}:{{ item.split(' ')[1] }}
+  whith_items: "{{ docker_images.stdout_lines }}"

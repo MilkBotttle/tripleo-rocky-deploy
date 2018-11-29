@@ -5,3 +5,11 @@
     - role: create-local-registry
       vars:
         create_by_tar: true
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create TripleO image environment file
+      template:
+        src: templates/containers-images-params.yaml.j2
+        dest: 05-container-images.yaml
