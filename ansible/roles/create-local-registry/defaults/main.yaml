@@ -1,2 +1,4 @@
 registry_server: 127.0.0.1
 registry_port: 8787
+create_by_tar:
+prepare:

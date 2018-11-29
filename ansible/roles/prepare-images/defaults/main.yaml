@@ -1,3 +1,4 @@
+archive_images:
 tripleo_images_list:
   - DockerAodhApiImage: docker.io/tripleorocky/centos-binary-aodh-api:current-tripleo
   - DockerAodhConfigImage: docker.io/tripleorocky/centos-binary-aodh-api:current-tripleo
