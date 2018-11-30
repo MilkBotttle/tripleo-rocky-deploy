@@ -17,6 +17,7 @@
     chain: INPUT
     destination_port: "{{ registry_port }}"
     protocol: tcp
+    ctstate: NEW
     jump: ACCEPT
   become: yes
 
