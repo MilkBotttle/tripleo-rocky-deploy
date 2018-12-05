@@ -28,6 +28,9 @@ This will install docker registry, move images to registry.
 `ansible-playbook ansible/prepare-undercloud.yaml`
 2. Edit undercloud.conf at /home/stack
 
+## Generate undercloud offline registry image environment file
+1. Play
+`ansible-playbook -e @ansible/environment.yaml -t image-environment ansible/prepare-undercloud.yaml
 # Deploy undercloud workflow
 
 ## Scenario 1

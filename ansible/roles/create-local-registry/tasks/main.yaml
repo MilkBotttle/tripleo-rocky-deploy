@@ -12,6 +12,3 @@
   include_tasks: create-by-push.yaml
   when:
     - create_by_tar == false
-
-
-
