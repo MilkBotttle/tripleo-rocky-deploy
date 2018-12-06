@@ -144,14 +144,14 @@ undercloud_public_host = 192.168.24.2
 # unset disables SSL. (string value)
 undercloud_service_certificate =
 
-{% if offline == true %}
+{% if local_registry == true %}
 # Customize environment file to override default values. (string value)
 custom_env_files = /home/stack/05-container-images.yaml
-{% endif %}
 
 # Array of host/port combiniations of docker insecure registries.
 # (list value)
 docker_insecure_registries = {{ registry_server }}:{{ registry_port }}
+{% endif %}
 
 [ctlplane-subnet]
 

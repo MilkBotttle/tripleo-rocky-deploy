@@ -1,26 +1,51 @@
 ---
-- host: localhost
+- hosts: localhost
   gather_facts: no
-  vars_prompt:
-    - name: "ans"
-      prompt: "This task will remove all images on this node. Would you want to running this task ? (y/n)"
   tasks:
-    - failed:
-        msg: "Stop run this task ..."
-      when:
-        - ans == "y" or ans == "n"
-        - ans == "y"
+    - set_fact:
+        update_conf: false
+        insecure: "{{registry_server}}:{{registry_port}}"
 
-    - name: Force clean all images in docker
-      shell: |
-        docker rmi $(docker images -q) -f
-
-    - name: Create TripleO image vars file
+    - name: Create TripleO image list
       template:
         src: templates/containers-images-params.yaml.j2
         dest: /tmp/05-container-images.yaml
 
-    - include_vars: /tmp/05-container-images.yaml
+    - name: Load docker config for check
+      include_vars:
+        file: /etc/docker/daemon.json
+        name: docker_conf_json
+
+    - name: Check insecure registry config
+      set_fact:
+        update_conf: true
+      when: 'insecure not in docker_conf_json["insecure-registries"]'
+
+    - name: Update docker config
+      set_fact:
+        docker_conf_json: "{{ docker_conf_json | combine(new_item, recursive=true) }}"
+      vars:
+        new_item: "{ 'insecure-registries' : {{ docker_conf_json['insecure-registries'] + ['{{ insecure }}'] }} }"
+      when: update_conf == true
+      become: true
+
+    - name: Write docker config
+      copy:
+        content: "{{docker_conf_json | to_nice_json }}"
+        dest: /etc/docker/daemon.json
+        backup: true
+      when: update_conf == true
+      become: true
+
+    - name: Restart docker
+      yum:
+        name: docker
+        state: restarted
+      when: update_conf == true
+      become: true
+
+    - name: Include images list
+      include_vars: /tmp/05-container-images.yaml
 
     - set_fact:
         images_dicts: "{{ parameter_defaults.values() }}"
@@ -29,4 +54,12 @@
       shell: |
         docker pull {{ item }}
       with_items: "{{ images_dicts }}"
+      register: r
       become: true
+
+    - fail:
+        msg: "Pull failed {{ item.item }}"
+      when: item.failed == true
+      with_items: "{{r.results}}"
+      loop_control:
+        label: "{{ item.item }}"

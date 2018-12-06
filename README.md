@@ -7,7 +7,11 @@ Ansible playbooks for deploy.
 
 # Functions
 
-## Install docker-ce on fresh node
+## Install docker-ce on fresh node [x]
+This docker-ce version confict with tripleo-repo because this version newer
+than tripleo-repo. If you want to put offline yum repo and docker-registry
+together just play prepare undercloud.
+
 1. Play
 `ansible-playbook ansible/install-docker-ce.yaml`
 
@@ -28,22 +32,29 @@ This will install docker registry, move images to registry.
 
 ## Test local registry is ok
 This task pull all images from local registry to check.
-Need replace `registry_server`, `registry_port`
 
 1. Play
-`ansible-playbook --extra-vars "registry_server=<ip> registry_port=<port>" ansible/check-local-registry.yaml`
+`ansible-playbook -e "registry_server=<ip> -e "registry_port=<port>" ansible/check-local-registry.yaml`
 
 ## Prepare undercloud deploy
-This will install tripleo repo, if offline_yum_repo is true will pull from
-local-registry then create image environment file. If offline undercloud set
+This will install tripleo repo, if `local_registry` is true will create
+image environment file. If `offline_yum_registry` is true will directly
+install from local repository. (Need prepare local repository first.)
 
-1. Edit `ansible/environment.yaml`
+1. Required variables:
+   ```
+   local_registry: true|false
+   offline_yum_registry: true|false
+   registry_server: <ip> (required if local_registry is true)
+   registry_port: <port> (required if local_registry is true)
+   ```
+   
 2. Play
-`ansible-playbook -e @ansible/environment.yaml ansible/prepare-undercloud.yaml`
+`ansible-playbook -e "{local_registry: <bool>}" -e "{offline_yum_registry: <bool>}" -e "registry_server=<ip>" -e "registry_port=<port>" ansible/prepare-undercloud.yaml`
 
-## Create local registry images environment file
+## Create local registry images environment file [x]
 1. Play
-`ansible-playbook -e --extra-vars "local_registry=true" -t image-environment ansible/prepare-undercloud.yaml`
+`ansible-playbook -e "{local_registry: true}" -e "registry_server=<server>" -e "registry_port=<port>" -t image-environment ansible/prepare-undercloud.yaml`
 
 # Deploy undercloud workflow
 ## Scenario 1

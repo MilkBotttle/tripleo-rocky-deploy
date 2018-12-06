@@ -8,9 +8,10 @@
 - name: Install TripleO repo
   script: >
     files/get_tripleo_repo
-  when: offline_install == false and pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
+  when:
+    - offline_yum_registry == false
+    - pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
   tags: tripleo-rpm
-  when: offline_yum_registry == false
 
 - name: Enable TripleO repo "{{ tripleo_version }}"
   shell: tripleo-repos -b "{{ tripleo_version }}" current ceph
