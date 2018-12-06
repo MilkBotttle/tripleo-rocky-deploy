@@ -16,23 +16,22 @@
         file: /etc/docker/daemon.json
         name: docker_conf_json
 
-    - name: Update docker config
-      set_fact:
-        docker_conf_json: "{{ docker_conf_json | combine(new_item, recursive=true) }}"
-      vars:
-        new_item: "{ 'insecure-registries' : {{ docker_conf_json['insecure-registries'] + ['{{ insecure }}'] }} }"
-      when:
-        - docker_conf_json["insecure-registries"] is defined
-        - 'insecure not in docker_conf_json["insecure-registries"]'
-      register: ca
-      become: true
-
-    - name: Update docker config
+    - name: Update when inseucre registry not defined
       set_fact:
         docker_conf_json: "{{ docker_conf_json | combine(new_item, recursive=true) }}"
       vars:
         new_item: "{ 'insecure-registries' : ['{{ insecure }}'] }"
-      when: docker_conf_json["insecure-registries"] is not defined
+      when: 'docker_conf_json["insecure-registries"] is not defined'
+      register: ca
+      become: true
+
+    - name: Update when inseurce registry not in config
+      set_fact:
+        docker_conf_json: "{{ docker_conf_json | combine(new_item, recursive=true) }}"
+      vars:
+        new_item: "{ 'insecure-registries' : {{ docker_conf_json['insecure-registries'] + [ insecure ] }} }"
+      when:
+        - 'insecure not in docker_conf_json["insecure-registries"]'
       register: cb
       become: true
 
@@ -41,14 +40,16 @@
         content: "{{docker_conf_json | to_nice_json }}"
         dest: /etc/docker/daemon.json
         backup: true
-      when: ca.state == changed or cb.state == changed
+      # Cameron.C: one of the set_fact task is ok state
+      when: ca.skipped is not defined or cb.skipped is not defined
       become: true
 
     - name: Restart docker
       systemd:
         name: docker
         state: restarted
-      when: ca.state == changed or cb.state == changed
+      # Cameron.C: one of the set_fact task is ok state
+      when: ca.skipped is not defined or cb.skipped is not defined
       become: true
 
     - name: Include images list
@@ -64,6 +65,7 @@
       register: r
       become: true
 
+    # Cameron.C: Output pull failed images
     - fail:
         msg: "Pull failed {{ item.item }}"
       when: item.failed == true
