@@ -16,17 +16,23 @@
         file: /etc/docker/daemon.json
         name: docker_conf_json
 
-    - name: Check insecure registry config
-      set_fact:
-        update_conf: true
-      when: 'insecure not in docker_conf_json["insecure-registries"]'
-
     - name: Update docker config
       set_fact:
         docker_conf_json: "{{ docker_conf_json | combine(new_item, recursive=true) }}"
       vars:
         new_item: "{ 'insecure-registries' : {{ docker_conf_json['insecure-registries'] + ['{{ insecure }}'] }} }"
-      when: update_conf == true
+      when:
+        - 'insecure not in docker_conf_json["insecure-registries"]'
+      register: ca
+      become: true
+
+    - name: Update docker config
+      set_fact:
+        docker_conf_json: "{{ docker_conf_json | combine(new_item, recursive=true) }}"
+      vars:
+        new_item: "{ 'insecure-registries' : ['{{ insecure }}'] }"
+      when: docker_conf_json["insecure-registries"] is not defined
+      register: cb
       become: true
 
     - name: Write docker config
@@ -34,14 +40,14 @@
         content: "{{docker_conf_json | to_nice_json }}"
         dest: /etc/docker/daemon.json
         backup: true
-      when: update_conf == true
+      when: ca.state == changed or cb.state == changed
       become: true
 
     - name: Restart docker
       systemd:
         name: docker
         state: restarted
-      when: update_conf == true
+      when: ca.state == changed or cb.state == changed
       become: true
 
     - name: Include images list
