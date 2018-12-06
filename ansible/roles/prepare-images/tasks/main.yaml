@@ -2,9 +2,9 @@
 
 - name: Pull images
   docker_image:
-    name: "{{ item.values()[0].split(":")[0] }}"
-    tag: "{{ item.values()[0].split(":")[1]"
+    name: "{{ item.values()[0].split(':')[0] }}"
+    tag: "{{ item.values()[0].split(':')[1] }}"
     pull: yes
   loop_control:
     label: "Pull {{ item.keys()[0] }}"
-  with_items:"{{ tripleo_images_list }}"
+  with_items: "{{ tripleo_images_list }}"
