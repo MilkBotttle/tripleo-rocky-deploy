@@ -12,11 +12,6 @@
       vars:
         - prepare: true
   tasks:
-    - name: install jq
-      yum:
-        name:
-          - files/jq/oniguruma-5.9.5-3.el7.x86_64.rpm
-          - files/jq/jq-1.5-1.el7.x86_64.rpm
     - name: install docker-py
       pip:
         name: docker-py

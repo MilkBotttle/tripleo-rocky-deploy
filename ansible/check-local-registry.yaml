@@ -1,0 +1,32 @@
+---
+- host: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "ans"
+      prompt: "This task will remove all images on this node. Would you want to running this task ? (y/n)"
+  tasks:
+    - failed:
+        msg: "Stop run this task ..."
+      when:
+        - ans == "y" or ans == "n"
+        - ans == "y"
+
+    - name: Force clean all images in docker
+      shell: |
+        docker rmi $(docker images -q) -f
+
+    - name: Create TripleO image vars file
+      template:
+        src: templates/containers-images-params.yaml.j2
+        dest: /tmp/05-container-images.yaml
+
+    - include_vars: /tmp/05-container-images.yaml
+
+    - set_fact:
+        images_dicts: "{{ parameter_defaults.values() }}"
+
+    - name: Pull all images from local-registry
+      shell: |
+        docker pull {{ item }}
+      with_items: "{{ images_dicts }}"
+      become: true

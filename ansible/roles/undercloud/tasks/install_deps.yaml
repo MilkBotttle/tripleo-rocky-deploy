@@ -3,18 +3,21 @@
   yum:
     list=python2-tripleo-repos
   register: pkg
+  when: offline_yum_registry == false
 
 - name: Install TripleO repo
   script: >
     files/get_tripleo_repo
   when: offline_install == false and pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
   tags: tripleo-rpm
+  when: offline_yum_registry == false
 
 - name: Enable TripleO repo "{{ tripleo_version }}"
   shell: tripleo-repos -b "{{ tripleo_version }}" current ceph
   become: true
   when: offline_install == false
   tags: tripleo-rpm
+  when: offline_yum_registry == false
 
 - name: Install tripleo client
   yum:

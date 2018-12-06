@@ -3,10 +3,10 @@
 - include_tasks: create_stack_user.yaml
 - include_tasks: setup_hostname.yaml
 - include_tasks: install_deps.yaml
-
 - name: Prepare undercloud.conf
-  copy:
-    src: ../files/undercloud.conf
+  template:
+    src: ../templates/undercloud.conf.j2
     dest: /home/stack/undercloud.conf
+    backup: true
     owner: stack
     group: stack

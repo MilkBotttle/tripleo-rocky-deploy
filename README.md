@@ -6,14 +6,17 @@ Ansible playbooks for deploy.
 * Ansible >= 2.4
 
 # Functions
+
+## Install docker-ce on fresh node
+1. Play
+`ansible-playbook ansible/install-docker-ce.yaml`
+
 ## Prepare offline image tarball
 This will install docker registry, pull images from docker hub and archive
-registry convience move to other node.
+registry convenience move to other node.
 
-1. If you have not installed docker play 
-   `ansible-playbook ansible/install-docker-ce.yaml` install lasted docker.
-2. Edit environment file `ansible/environment.yaml`
-3. Play 
+1. Edit environment file `ansible/environment.yaml`
+2. Play 
 `ansible-playbook -e @ansible/environment.yaml ansible/create-tripleo-images-registry-tarball.yaml`
 
 ## Prepare offline registry
@@ -23,16 +26,26 @@ This will install docker registry, move images to registry.
 2. Play
 `ansible-playbook -e @ansible/environment.yaml ansible/create-offline-registry.yaml`
 
+## Test local registry is ok
+This task pull all images from local registry to check.
+Need replace `registry_server`, `registry_port`
+
+1. Play
+`ansible-playbook --extra-vars "registry_server=<ip> registry_port=<port>" ansible/check-local-registry.yaml`
+
 ## Prepare undercloud deploy
-1. Play
-`ansible-playbook ansible/prepare-undercloud.yaml`
-2. Edit undercloud.conf at /home/stack
+This will install tripleo repo, if offline_yum_repo is true will pull from
+local-registry then create image environment file. If offline undercloud set
 
-## Generate undercloud offline registry image environment file
+1. Edit `ansible/environment.yaml`
+2. Play
+`ansible-playbook -e @ansible/environment.yaml ansible/prepare-undercloud.yaml`
+
+## Create local registry images environment file
 1. Play
-`ansible-playbook -e @ansible/environment.yaml -t image-environment ansible/prepare-undercloud.yaml
+`ansible-playbook -e --extra-vars "local_registry=true" -t image-environment ansible/prepare-undercloud.yaml`
+
 # Deploy undercloud workflow
-
 ## Scenario 1
 Install with Internet
 1. Prepare undercloud deploy

@@ -5,3 +5,11 @@ registry_port: 8787
 # create offline registry tarball path
 archive_images: false
 tripleo_tar_images: tripleo-images.tar
+
+# prepare undercloud
+# When offline set true, will skip install tripleo repo directly install
+# tripleoclient from local repo.
+# When local_registry is true will create environment file and add config in
+# undercloud.conf
+local_registry: false
+offline_yum_registry: false
