@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Tar all registry images
+      archive:
+        format: tar
+        path: /var/lib/registry/docker
+        dest: "{{ tripleo_tar_images }}"
+
+    - debug:
+        msg: "Registry images created at {{ tripleo_tar_images }}"
