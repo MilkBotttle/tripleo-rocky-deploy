@@ -22,6 +22,7 @@
       vars:
         new_item: "{ 'insecure-registries' : {{ docker_conf_json['insecure-registries'] + ['{{ insecure }}'] }} }"
       when:
+        - docker_conf_json["insecure-registries"] is defined
         - 'insecure not in docker_conf_json["insecure-registries"]'
       register: ca
       become: true
