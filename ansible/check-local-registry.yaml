@@ -38,7 +38,7 @@
       become: true
 
     - name: Restart docker
-      yum:
+      systemd:
         name: docker
         state: restarted
       when: update_conf == true
