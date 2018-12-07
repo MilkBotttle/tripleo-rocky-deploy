@@ -1,13 +1,23 @@
 ---
 
-- name: Get images name list
-  shell: |
-    # repository tag
-    docker images | grep -v ID | awk '{print $1,$2}'
-  register: docker_images
+#- name: Get images name list
+#  shell: |
+#    # repository tag
+#    docker images | grep -v ID | awk '{print $1,$2}'
+#  register: docker_images
+
+#- name: Push all images
+#  shell: |
+#    docker tag {{ item.split(' ')[0] }}:{{ item.split(' ')[1] }} {{ registry_server }}:{{ registry_port }}/{{ item.split(' ')[0] }}:{{ item.split(' ')[1] }}
+#    docker push {{ registry_server }}:{{ registry_port }}/{{ item.split(' ')[0] }}:{{ item.split(' ')[1] }}
+#  with_items: "{{ docker_images.stdout_lines }}"
+- fail:
+    msg: "You need use role prepare-images to get tripleo_images_list."
+  when: tripleo_images_list is not defined
 
 - name: Push all images
   shell: |
-    docker tag {{ item.split(' ')[0] }}:{{ item.split(' ')[1] }} {{ registry_server }}:{{ registry_port }}/{{ item.split(' ')[0] }}:{{ item.split(' ')[1] }}
-    docker push {{ registry_server }}:{{ registry_port }}/{{ item.split(' ')[0] }}:{{ item.split(' ')[1] }}
-  with_items: "{{ docker_images.stdout_lines }}"
+    docker tag {{ item.values()[0] }} {{ registry_server }}:{{ registry_port }}/{{ item.values()[0] }}
+    docker push {{ registry_server }}:{{ registry_port }}/{{ item.values()[0] }}
+  with_items: "{{ tripleo_images_list }}"
+  # item {DockerAodhApiImage: docker.io/tripleorocky/centos-binary-aodh-api:current-tripleo}
