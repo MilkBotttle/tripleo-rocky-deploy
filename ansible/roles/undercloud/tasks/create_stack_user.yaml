@@ -10,6 +10,8 @@
     group: stack
     state: present
     shell: /bin/bash
+    password: "{{ stack_user_password | default('password') | password_hash('sha512', 'mysecretsalt') }}"
+    update_password: on_create
 
 - name: Grant sudo privileges to stack user
   copy:

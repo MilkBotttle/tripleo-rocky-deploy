@@ -10,25 +10,22 @@ Ansible playbooks for deploy.
 ## Install docker-ce on fresh node [x]
 This docker-ce version confict with tripleo-repo because this version newer
 than tripleo-repo. If you want to put offline yum repo and docker-registry
-together just play prepare undercloud.
+together just play prepare undercloud tripleo-repo will setup docker at install.
 
 1. Play
 `ansible-playbook ansible/install-docker-ce.yaml`
 
 ## Prepare offline image tarball
-This will install docker registry, pull images from docker hub and archive
-registry convenience move to other node.
+This will install docker registry, pull images from docker hub, push to registry.
 
 1. Required variables:
    ```
    registry_server: Required. Registry server bind ip. Default 127.0.0.1.(String)
    registry_port: Required. Registry server bind port. Default 8787 (Straing)
-   archive_images: Required. Tarball registry images, set to true. (Blooean)
-   tripleo_tar_images: Required. Images tarball path. (String)
 
    ```
 2. Play 
-`ansible-playbook -e "{archive_images: true}" -e "registry_server=<ip>" -e "registry_port=<port>" -e "tripleo_tar_images=<path-to-images-tarball> ansible/create-tripleo-images-registry-tarball.yaml`
+`ansible-playbook -e "registry_server=<ip>" -e "registry_port=<port>" ansible/create-tripleo-images-registry.yaml`
 
 ## Create image tarball at registry node [x]
 1. Required variables:
@@ -37,7 +34,7 @@ registry convenience move to other node.
 
    ```
 2. Play
-`ansible-playbook ansible/create-registry-images-tarball.yaml`
+`ansible-playbook -e "tripleo_tar_images=<path>"ansible/create-registry-images-tarball.yaml`
 
 ## Create offline registry by tarball image
 This will install docker registry, move images to registry, config firewall.
@@ -70,10 +67,12 @@ install from local repository. (Need prepare local repository first.)
 
 1. Required variables:
    ```
+   stack_user_password: Optional. Update user "stack" password only on create. Default is "password".(String)
    local_registry: Required. Default false.(Blooean)
    offline_yum_registry: Required. Default false.(Blooean)
-   registry_server: Required if local_registry is true. Default 127.0.0.1. (String)
-   registry_port: Required if local_registry is true. Default 8787. (Straing)
+   registry_server: Required. If local_registry is true. Default 127.0.0.1. (String)
+   registry_port: Required. If local_registry is true. Default 8787. (Straing)
+   external_ceph: Optional. If need install ceph. Default false (Blooean)
    ```
 2. Play
 `ansible-playbook -e "{local_registry: <bool>}" -e "{offline_yum_registry: <bool>}" -e "registry_server=<ip>" -e "registry_port=<port>" ansible/prepare-undercloud.yaml`

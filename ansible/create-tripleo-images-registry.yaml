@@ -16,7 +16,7 @@
       pip:
         name: docker-py
 
-# pull, push and create local registry
+# pull and push to create local registry
 - hosts: localhost
   gather_facts: no
   become: true
@@ -25,15 +25,3 @@
     - role: create-local-registry
       vars:
         create_by_tar: false
-
-- hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Tar all registry images
-      archive:
-        format: tar
-        path: /var/lib/registry/docker
-        dest: tripleo-images.tar
-      when:
-        - archive_images is defined
-        - archive_images == true

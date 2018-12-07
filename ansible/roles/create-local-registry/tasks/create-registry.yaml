@@ -19,6 +19,7 @@
     protocol: tcp
     ctstate: NEW
     jump: ACCEPT
+    action: insert
   become: yes
 
 - name: Add insecure-registries json
@@ -38,5 +39,5 @@
 - name: Start docker-distribution
   systemd:
     name: docker-distribution
-    state: started
+    state: restarted
     enabled: true
