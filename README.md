@@ -15,7 +15,7 @@ together just play prepare undercloud tripleo-repo will setup docker at install.
 1. Play
 `ansible-playbook ansible/install-docker-ce.yaml`
 
-## Prepare offline image tarball
+## Prepare tripleo images local registry
 This will install docker registry, pull images from docker hub, push to registry.
 
 1. Required variables:
@@ -27,7 +27,7 @@ This will install docker registry, pull images from docker hub, push to registry
 2. Play 
 `ansible-playbook -e "registry_server=<ip>" -e "registry_port=<port>" ansible/create-tripleo-images-registry.yaml`
 
-## Create image tarball at registry node [x]
+## Create tripleo images tarball at registry node [x]
 1. Required variables:
    ```
    tripleo_tar_images: Required. Images tarball path. (String)
@@ -36,7 +36,7 @@ This will install docker registry, pull images from docker hub, push to registry
 2. Play
 `ansible-playbook -e "tripleo_tar_images=<path>"ansible/create-registry-images-tarball.yaml`
 
-## Create offline registry by tarball image
+## Create tripleo images local-registry by tarball image
 This will install docker registry, move images to registry, config firewall.
 
 1. Required variables:
@@ -93,17 +93,18 @@ install from local repository. (Need prepare local repository first.)
 ## Scenario 1
 Install with Internet
 1. Prepare undercloud deploy
-2. Edit undercloud.conf at /home/stack
+2. Edit `undercloud.conf` at /home/stack
 3. Deploy undercloud
+`openstack undercloud install`
 
 ## Scenario 2
 Deploy without Internet
-1. Prepare offline repo
-2. Prepare offline registry
+1. Prepare offline yum repo
+2. Prepare local registry with tarball images
 3. Prepare undercloud deploy
 4. Edit undercloud.conf at /home/stack
 5. Deploy undercloud
+`openstack undercloud install`
 
 #Cameron TODO
-- split  `Prepare offline image tarball` to create local registry and tarball
 - clitool
