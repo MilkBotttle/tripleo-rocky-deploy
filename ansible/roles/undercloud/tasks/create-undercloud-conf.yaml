@@ -1,0 +1,5 @@
+- template:
+    src: ../templates/undercloud.conf.j2
+    dest: "{{ tmpdir.path }}/undercloud.conf"
+    owner: stack
+    group: stack

@@ -8,7 +8,7 @@
   when:
     - create_by_tar == true
 
-- name: Create local registry by push
-  include_tasks: create-by-push.yaml
-  when:
-    - create_by_tar == false
+      #- name: Create local registry by push
+      #  include_tasks: create-by-push.yaml
+      #  when:
+      #    - create_by_tar == false

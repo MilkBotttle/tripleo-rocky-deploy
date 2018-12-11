@@ -1,7 +1,39 @@
 ---
 - hosts: localhost
   gather_facts: no
-  roles:
-    - role: create-local-registry
-      vars:
-        create_by_tar: true
+  tasks:
+    - set_fact: default_image="/hoem/stack/tripleo-default-container-image.yaml"
+
+    - name: Install Requirement
+      include_role:
+        name: undercloud
+
+    - name: Install docker registry
+      include_role:
+        name: create-local-registry
+        tasks_from: create-registry.yaml
+
+    - name: Prepare container image default env
+      shell: |
+        openstack tripleo container image prepare default --push-local-destination --output-env-file {{ default_image }}
+
+    - name: Update push destination
+      replace:
+        path: "{{ default_image }}"
+        regexp: "push_destination: true"
+        replace: "push_destination: {{registry_server}}:{{registry_port}}"
+
+    - name: Preapre container image
+      shell: |
+        openstack tripleo container image prepare -e {{ default_image }} 2>&1 | tee /home/stack/tripleo-container-image-prepare.log
+
+    - name: Create Overcloud required env
+      shell: |
+        openstack overcloud container image prepare --push-destination {{ registry_server }}:{{ registry_port }}
+
+    - debug:
+        msg: |
+          Local registry install completed.
+          Image prepare log is at /home/stack/tripleo-container-image-prepare.log
+          Registry Address: {{registry_server}}:{{registry_port}}
+          Test registry with command: curl -X GET {{registry_server}}:{{registry_port}}/v2/_catalog

@@ -1,0 +1,10 @@
+---
+- name: Create tripleo container image default config
+  shell: |
+    openstack tripleo container image prepare default --output-env-file /home/stack/tripleo-default-container-images.yaml
+
+- name: Update push destination
+  replace:
+    path: /home/stack/tripleo-default-container-images.yaml
+    regexp: 'push_destination: localhost'
+    replace: 'push_destination: {{ registry_server }}:8787'

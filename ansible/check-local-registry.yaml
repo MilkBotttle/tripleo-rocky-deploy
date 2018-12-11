@@ -2,14 +2,20 @@
 - hosts: localhost
   gather_facts: no
   tasks:
+    - name: Install deps
+      include_role: undercloud
+
+    - tmpfile:
+        state: directory
+      register: tmpdir
+
     - set_fact:
         update_conf: false
         insecure: "{{registry_server}}:{{registry_port}}"
 
     - name: Create TripleO image list
-      template:
-        src: templates/containers-images-params.yaml.j2
-        dest: /tmp/05-container-images.yaml
+      shell: |
+        openstack overcloud container image prepare --push-destination {{ registry_server }}:{{ registry_port }} --output-env-file {{ tmpdir.path }}/image-list.yaml
 
     - name: Load docker config for check
       include_vars:
@@ -23,6 +29,7 @@
         new_item: "{ 'insecure-registries' : ['{{ insecure }}'] }"
       when: 'docker_conf_json["insecure-registries"] is not defined'
       register: ca
+      changed_when: ca.skipped is not defined
       become: true
 
     - name: Update when inseurce registry not in config
@@ -33,6 +40,7 @@
       when:
         - 'insecure not in docker_conf_json["insecure-registries"]'
       register: cb
+      changed_when: cb.skipped is not defined
       become: true
 
     - name: Write docker config
@@ -40,20 +48,18 @@
         content: "{{docker_conf_json | to_nice_json }}"
         dest: /etc/docker/daemon.json
         backup: true
-      # Cameron.C: one of the set_fact task is ok state
-      when: ca.skipped is not defined or cb.skipped is not defined
+      when: ca.changed or cb.changed
       become: true
 
     - name: Restart docker
       systemd:
         name: docker
         state: restarted
-      # Cameron.C: one of the set_fact task is ok state
-      when: ca.skipped is not defined or cb.skipped is not defined
+      when: ca.changed or cb.changed
       become: true
 
     - name: Include images list
-      include_vars: /tmp/05-container-images.yaml
+      include_vars: "{{ tmpfile.path }}/image-list.yaml }}"
 
     - set_fact:
         images_dicts: "{{ parameter_defaults.values() }}"
@@ -62,13 +68,14 @@
       shell: |
         docker pull {{ item }}
       with_items: "{{ images_dicts }}"
-      register: r
+      loop_control:
+        label: "{{ item }}"
       become: true
 
-    # Cameron.C: Output pull failed images
-    - fail:
-        msg: "Pull failed {{ item.item }}"
-      when: item.failed == true
-      with_items: "{{r.results}}"
-      loop_control:
-        label: "{{ item.item }}"
+    # Cameron.c: Find a good way to print this.
+    - debug:
+        msg: |
+          Pull failed images
+          {% for item in r.results %}
+            item.item
+          {% endfor %}

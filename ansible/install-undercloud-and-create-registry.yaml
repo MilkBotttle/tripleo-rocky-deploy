@@ -1,0 +1,55 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - set_fact: default_image="/hoem/stack/tripleo-default-container-image.yaml"
+
+    - name: Install requirement
+      include_role: undercloud
+
+    - name: Prepare container image default env
+      shell: |
+        openstack tripleo container image prepare default --output-env-file {{ default_image }}
+
+    - tempfile:
+        state: directory
+      register: tmpdir
+
+    - name: Prepare prototype undercloud.conf
+      include_role: undercloud
+      tasks_from: create-undercloud-conf.yaml
+
+    - name: Merge undercloud config with custom config
+      merge_config:
+        dest: /home/stack/undercloud.conf
+        sources:
+          - "../undercloud.conf"
+          - "{{ tmpdir.path }}/undercloud.conf"
+        owner: stack
+        group: stack
+
+    - name: Install Undercloud
+      shell: |
+        openstack undercloud install
+      become: stack
+      register: uc_install
+      ignore_errors: yes
+
+    - fail:
+        msg: "Deploy undercloud with reistry fail please check /home/stack/install-undercloud.log"
+      when: "'ERROR' in uc_install.stderr"
+
+    - name: Create Overcloud required env
+      shell: |
+        openstack overcloud container image prepare --push-destination {{ registry_server }}:{{ registry_port }} --output-env-file /home/stack/overcloud-container-images.yaml
+
+    - shell: |
+        tail -n 22 /home/stack/install-undercloud.log
+      register: ucmsg
+
+    - debug:
+        msg: |
+         {{ ucmsg.stdout }}
+         Overcloud image environment is at /home/stack/overcloud-container-images.yaml
+
+
