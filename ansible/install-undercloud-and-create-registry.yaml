@@ -2,7 +2,10 @@
 - hosts: localhost
   gather_facts: no
   tasks:
-    - set_fact: default_image="/hoem/stack/tripleo-default-container-image.yaml"
+    - set_fact:
+        - default_image: /home/stack/tripleo-default-container-image.yaml
+        - tripleo_version: rocky
+        - offline_yum_registry: false
 
     - name: Install requirement
       include_role: undercloud
@@ -16,8 +19,9 @@
       register: tmpdir
 
     - name: Prepare prototype undercloud.conf
-      include_role: undercloud
-      tasks_from: create-undercloud-conf.yaml
+      include_role:
+        name: undercloud
+        tasks_from: create-undercloud-conf.yaml
 
     - name: Merge undercloud config with custom config
       merge_config:
@@ -27,17 +31,19 @@
           - "{{ tmpdir.path }}/undercloud.conf"
         owner: stack
         group: stack
+        mode: 0644
 
     - name: Install Undercloud
       shell: |
         openstack undercloud install
-      become: stack
+      become: yes
+      become_user: stack
       register: uc_install
       ignore_errors: yes
 
     - fail:
         msg: "Deploy undercloud with reistry fail please check /home/stack/install-undercloud.log"
-      when: "'ERROR' in uc_install.stderr"
+      when: "uc_install.failed"
 
     - name: Create Overcloud required env
       shell: |
