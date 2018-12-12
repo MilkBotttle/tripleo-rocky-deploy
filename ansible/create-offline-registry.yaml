@@ -27,10 +27,6 @@
       shell: |
         openstack tripleo container image prepare -e {{ default_image }} 2>&1 | tee /home/stack/tripleo-container-image-prepare.log
 
-    - name: Create Overcloud required env
-      shell: |
-        openstack overcloud container image prepare --push-destination {{ registry_server }}:{{ registry_port }}
-
     - debug:
         msg: |
           Local registry install completed.
