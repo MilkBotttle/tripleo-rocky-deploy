@@ -3,9 +3,9 @@
   gather_facts: no
   tasks:
     - set_fact:
-        - default_image: /home/stack/tripleo-default-container-image.yaml
-        - tripleo_version: rocky
-        - offline_yum_registry: false
+        default_image: /home/stack/tripleo-default-container-image.yaml
+        tripleo_version: rocky
+        offline_yum_registry: false
 
     - name: Install requirement
       include_role: undercloud
