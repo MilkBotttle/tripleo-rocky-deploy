@@ -25,7 +25,7 @@
         tasks_from: create-undercloud-conf.yaml
 
     - name: Merge undercloud config with custom config
-      merge_config:
+      merge_configs:
         dest: /home/stack/undercloud.conf
         sources:
           - "../undercloud.conf"
