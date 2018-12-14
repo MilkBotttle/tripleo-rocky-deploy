@@ -2,7 +2,10 @@
 - hosts: localhost
   gather_facts: no
   tasks:
-    - set_fact: default_image="/hoem/stack/tripleo-default-container-image.yaml"
+    - set_fact:
+        default_image: "/home/stack/tripleo-default-container-image.yaml"
+        offline_yum_registry: false
+        tripleo_version: rocky
 
     - name: Install Requirement
       include_role:
@@ -15,7 +18,7 @@
 
     - name: Prepare container image default env
       shell: |
-        openstack tripleo container image prepare default --push-local-destination --output-env-file {{ default_image }}
+        openstack tripleo container image prepare default --local-push-destination --output-env-file {{ default_image }}
 
     - name: Update push destination
       replace:
